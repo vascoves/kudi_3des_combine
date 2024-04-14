@@ -51,7 +51,7 @@ def lambda_handler(event, context):
 	
     print(event)
     data = event["body-json"]
-    if "components" in data:
+    if "components" not in data:
       return {
         'statusCode': 422,
         'headers': {'Content-Type': 'application/json'},                
