@@ -52,11 +52,7 @@ def lambda_handler(event, context):
     print(event)
     data = event["body-json"]
     if "components" not in data:
-      return {
-        'statusCode': 422,
-        'headers': {'Content-Type': 'application/json'},                
-        'body': 'Missing parameters'
-      }
+      raise Exception ("unprocessable entity")
 	
     '''
 
