@@ -50,8 +50,13 @@ def encrypt3DES(skey,sdata):
 def lambda_handler(event, context):
 	
     print(event)
-    
-    data = {}
+    data = event["'body-json"]
+    if "components" in data:
+      return {
+        'statusCode': 422,
+        'headers': {'Content-Type': 'application/json'},                
+        'body': 'Missing parameters'
+      }
 	
     '''
 
