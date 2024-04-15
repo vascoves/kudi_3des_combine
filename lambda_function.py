@@ -52,7 +52,12 @@ def lambda_handler(event, context):
   print(event)
   data = event["body-json"]
   if "components" not in data:
-    raise Exception ("unprocessable entity")
+    raise Exception (
+        {
+          "message": "unprocessable entity",
+          "code": 422
+        }
+        )
   else:
     components = data = event["body-json"]["components"]
     num_comp = len(components)
