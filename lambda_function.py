@@ -1,13 +1,13 @@
 import json
 import binascii
 import secrets
+import re
 from pyDes import *
 
 
 #XOR 3DES 2 components
-def xorKeys3DES(a,b):
-
-    length = 32
+def xorKeys2(a,b):
+    
     c1 = int(str(a),16)
     c2 = int(str(b),16)
     result = int(c1) ^ int(c2)
@@ -49,69 +49,34 @@ def encrypt3DES(skey,sdata):
 
 def lambda_handler(event, context):
 	
-    print(event)
-    data = event["body-json"]
-    if "components" not in data:
-      raise Exception ("unprocessable entity")
-	
-    '''
+  print(event)
+  data = event["body-json"]
+  if "components" not in data:
+    raise Exception ("unprocessable entity")
+  else:
+    components = data = event["body-json"]["components"]
+    num_comp = len(components)
+    if num_comp not in [2,3]:
+      raise Exception ("only accept 2 or 3 components")
+    else:
+      for comp in components:
+        if not re.match(r'^[\dABCDEF]{32}$', comp):
+          raise Exception ("Key malformed")
+      if num_comp == 2:
+        key_comb = xorKeys2(components[0],components[1])
+      if num_comp == 3:
+        key_comb = xorKeys3(components[0],components[1],components[2])
+  key_kcv = getKCV(key_comb).upper()[2:8]
+  result = {
+    "combined_key" : 
+            {
+                "value" : key_comb,
+                "KCV" : key_kcv
+            },
+    "components" : components
 
-    comp_list = []
-    comp1 = generateRandomKey(128)
-    c1 = int(comp1,16)
-    #print(getKCV(comp1).upper()[2:8])
-    data_c1 = {
-		"number" : 1,
-		"value" : comp1.upper(),
-		"KCV" : getKCV(comp1).upper()[2:8]
-    }
-    comp_list.append(data_c1)   
-	
-    comp2 = generateRandomKey(128)
-    c2 = int(comp2,16)
-    #print(getKCV(comp2).upper()[2:8])
-    
-    data_c2 = {
-		"number" : 2,
-		"value" : comp2.upper(),
-		"KCV" : getKCV(comp2).upper()[2:8]
-    }    
-	
-    comp_list.append(data_c2)   
-    comp3 = generateRandomKey(128)
-    c3 = int(comp3,16)	
-    #print(getKCV(comp3).upper()[2:8])	
-    
-    data_c3 = {
-		"number" : 3,
-		"value" : comp3.upper(),
-		"KCV" : 
-    }      
-    comp_list.append(data_c3)   
-	
-
-    getKCV(comp3).upper()[2:8]
-
-    resultKey = xorKeys3(c1,c2,c3)
-    #print(resultKey.upper())
-    data["masterKey"] = resultKey.upper()
-    #print(getKCV(resultKey).upper()[2:8])
-    data["KCV"] = getKCV(resultKey).upper()[2:8]
-    data["type"] = "3DES"
-    data["componets"] = comp_list	
-
-	
-    response = {
-      "combined_key" : 
-	            {
-                  "value" : 
-                  "KCV" :
-              },
-			"components" :
-
-    }
-	  '''
-    return data
+  }
+  return result
 
 
 #if __name__ == "__main__": lambda_handler("", "")
