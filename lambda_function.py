@@ -52,16 +52,16 @@ def lambda_handler(event, context):
   print(event)
   data = event["body-json"]
   if "components" not in data:
-    raise Exception ("422 Unprocessable entity")
+    raise Exception ("{\"code\":\"422\",\"message\":\"Unprocessable entity\"}")
   else:
     components = data = event["body-json"]["components"]
     num_comp = len(components)
     if num_comp not in [2,3]:
-      raise Exception ("only accept 2 or 3 components")
+      raise Exception ("{\"code\":\"422\",\"message\":\"Only 2 or 3 components are accepted\"}")
     else:
       for comp in components:
         if not re.match(r'^[\dABCDEF]{32}$', comp):
-          raise Exception ("Key malformed")
+          raise Exception ("{\"code\":\"422\",\"message\":\"Key malformed\"}")
       if num_comp == 2:
         key_comb = xorKeys2(components[0],components[1])
       if num_comp == 3:
