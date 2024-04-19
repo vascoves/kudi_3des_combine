@@ -68,10 +68,11 @@ def lambda_handler(event, context):
         key_comb = xorKeys3(components[0],components[1],components[2])
   key_kcv = getKCV(key_comb).upper()[2:8]
   result = {
-    "combined_key" : 
+    "key" : 
             {
                 "value" : key_comb,
-                "KCV" : key_kcv
+                "KCV" : key_kcv,
+                "type": "3DES",
             },
     "components" : components
 
